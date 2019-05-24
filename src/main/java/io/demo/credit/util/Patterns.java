@@ -1,5 +1,6 @@
 package io.demo.credit.util;
 
+import io.demo.credit.model.CreditApplication;
 
 public class Patterns {
 	
@@ -25,6 +26,17 @@ public class Patterns {
 	public static final String ROLE_USER			= "USER";
 	public static final String ROLE_ADMIN			= "ADMIN";
 	public static final String ROLE_API				= "API";
+	
+	// Credit Application
+	public static final String APP_BANK_STATUS		= CreditApplication.BK_ST_CHK_AND_SAV + "|"
+													+ CreditApplication.BK_ST_CHK_ONLY + "|"
+													+ CreditApplication.BK_ST_SAV_ONLY + "|"
+													+ CreditApplication.BK_ST_NEITHER;
+	public static final String APP_EMP_STATUS		= CreditApplication.EMP_ST_EMPLOYED + "|"
+													+ CreditApplication.EMP_ST_SELF_EMPLOYED + "|"
+													+ CreditApplication.EMP_ST_STUDENT + "|"
+													+ CreditApplication.EMP_ST_RETIRED + "|"
+													+ CreditApplication.EMP_ST_UNEMPLOYED;
 
 			
 }

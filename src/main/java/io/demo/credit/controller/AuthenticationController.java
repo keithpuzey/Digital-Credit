@@ -20,7 +20,7 @@ public class AuthenticationController extends CommonController{
 	
 	@Autowired
 	UserService userService;
-
+	
 	/*
 	 * Authenticate User and provide an auth token
 	 */

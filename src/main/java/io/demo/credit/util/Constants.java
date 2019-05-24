@@ -5,6 +5,9 @@ import io.demo.credit.util.Patterns;
 public class Constants {
 	
 	
+	// Directives
+	public static final String DIR_REDIRECT 				= "redirect:";
+		
 	// Has Role
 	public static final String HAS_ROLE_USER				= "hasRole('" + Patterns.ROLE_USER + "')";
 	public static final String HAS_ROLE_ADMIN				= "hasRole('" + Patterns.ROLE_ADMIN + "')";
@@ -33,10 +36,10 @@ public class Constants {
 	public static final String URI_SWAGGER_V2				= "/v2/api-docs";
 	public static final String URI_SWAGGER_RES				= "/swagger-resources/**";
 	public static final String URI_SWAGGER_CONF				= "/configuration/**";
-	public static final String URI_SWAGGER_DOC				= "/swagger-ui.html";
 	public static final String URI_API_AUTH					= "/api/v1/auth";
 		
-	// Authenitcated URI
+	// Authenticated URI
+	public static final String URI_ROOT 					= "/";
 	public static final String URI_ALL						= "/**";
 	public static final String URI_API_ALL					= "/api/**";
 	public static final String URI_API_USR_ALL				= "/api/v1/users";
@@ -52,5 +55,6 @@ public class Constants {
 	public static final String URI_API_USR_UNEXPIRE			= "/api/v1/user/{id}/state/unexpire";
 	public static final String URI_API_USR_UNLOCK			= "/api/v1/user/{id}/state/unlock";
 	public static final String URI_API_USR_PASS_UNEXPIRE	= "/api/v1/user/{id}/password/unexpire";
+	public static final String URI_API_CREDIT_APPLICATION	= "/api/v1/credit/application";
 
 }

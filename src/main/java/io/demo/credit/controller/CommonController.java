@@ -51,5 +51,7 @@ public class CommonController {
 	public boolean hasRole(Users user, String roleName) {
 		return userService.hasRole(user, roleName);
 	}
+	
+	
 
 }

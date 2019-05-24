@@ -1,6 +1,6 @@
 package io.demo.credit.util;
 
-
+import io.demo.credit.model.CreditApplication;
 
 public class Messages {
 	
@@ -58,6 +58,24 @@ public class Messages {
 	public static final String USER_POSTAL_CODE_REQUIRED= "Postal Code is required.";
 	public static final String USER_COUNTRY_REQUIRED	= "Country is required.";
 	public static final String USER_PROFILE_UPDATED		= "Profile Updated Successfully.";
+	
+	// Credit Application
+	public static final String APP_BANK_STATUS_REQUIRED	= "Banking Status is required.";
+	public static final String APP_BANK_STATUS_FORMAT	= "Banking Status must either be '"
+														+ CreditApplication.BK_ST_CHK_AND_SAV + "', '"
+														+ CreditApplication.BK_ST_CHK_ONLY + "', '"
+														+ CreditApplication.BK_ST_SAV_ONLY + "', or '"
+														+ CreditApplication.BK_ST_NEITHER + "'";
+	public static final String APP_EMP_STATUS_REQUIRED	= "Employment Status is required.";
+	public static final String APP_EMP_STATUS_FORMAT	= "Employment Status must either be '"
+														+ CreditApplication.EMP_ST_EMPLOYED + "', "
+														+ CreditApplication.EMP_ST_SELF_EMPLOYED + "', '"
+														+ CreditApplication.EMP_ST_STUDENT + "', '"
+														+ CreditApplication.EMP_ST_RETIRED + "', or '"
+														+ CreditApplication.EMP_ST_UNEMPLOYED + "'";
+	public static final String APP_ANNUAL_INCOME		= "Annual Income must be a positive number";
+	public static final String APP_MONTHLY_MORTGAGE		= "Monthly Mortgage must be a positive number";
+	public static final String APP_AGREE_TERMS			= "You must agree to the terms";
 	
 	
 }

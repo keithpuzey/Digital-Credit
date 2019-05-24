@@ -303,7 +303,7 @@ public class UserService {
 	 * If the separators do not exist, they will be inserted to ensure 
 	 * a consistent format when storing the SSN value. 
 	 */
-	private String normalizeSSNFormat (String ssn) {
+	public String normalizeSSNFormat (String ssn) {
 		
 		LOG.debug("Normalize SSN-> SSN passed in is '" + ssn + "'");
 		

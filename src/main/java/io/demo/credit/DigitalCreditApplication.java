@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DigitalCreditApplication {
 
 	public static void main(String[] args) {
+	
 		SpringApplication.run(DigitalCreditApplication.class, args);
 	}
-
 }

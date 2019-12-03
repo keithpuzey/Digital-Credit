@@ -1,13 +1,16 @@
 package io.demo.credit.model;
 
 import java.util.Date;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,12 +23,14 @@ public class Account {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
-	@Column(nullable=false, updatable=false)
+	@Column(nullable=false, updatable=false, unique=true)
 	@JsonProperty (access = Access.READ_ONLY)
 	private Long id;
 	
-	@Column(name="accountNumber", nullable=false, unique=true)
-	private Long accountNumber;
+	@OneToOne (cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "account_number")
+	@JsonProperty (access = Access.READ_ONLY)
+	private AccountNumberSeq accountNumber;
 	
 	@JsonFormat(pattern="yyyy-MM-dd'T'hh:mm")
 	@DateTimeFormat(pattern="yyyy-MM-dd'T'hh:mm")
@@ -36,8 +41,12 @@ public class Account {
 	private Date dateClosed;
 	
 	@JsonIgnore
-	@ManyToOne(fetch=FetchType.EAGER)
-	private Users customer;
+	@OneToOne(fetch=FetchType.EAGER)
+	private Users accountOwner;
+	
+	public Account () {
+		accountNumber = new AccountNumberSeq();
+	}
 
 	/**
 	 * @return the id
@@ -47,24 +56,10 @@ public class Account {
 	}
 
 	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	/**
 	 * @return the accountNumber
 	 */
 	public Long getAccountNumber() {
-		return accountNumber;
-	}
-
-	/**
-	 * @param accountNumber the accountNumber to set
-	 */
-	public void setAccountNumber(Long accountNumber) {
-		this.accountNumber = accountNumber;
+		return accountNumber.getId();
 	}
 
 	/**
@@ -96,17 +91,19 @@ public class Account {
 	}
 
 	/**
-	 * @return the customer
+	 * @return the accountOwner
 	 */
-	public Users getCustomer() {
-		return customer;
+	public Users getAccountOwner() {
+		return accountOwner;
 	}
 
 	/**
-	 * @param customer the customer to set
+	 * @param accountOwner the accountOwner to set
 	 */
-	public void setCustomer(Users customer) {
-		this.customer = customer;
+	public void setAccountOwner(Users accountOwner) {
+		this.accountOwner = accountOwner;
 	}
+
+	
 	
 }

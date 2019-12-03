@@ -3,6 +3,7 @@ package io.demo.credit.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import io.demo.credit.exception.RestBadRequestException;
 import io.demo.credit.exception.RestObjectNotFoundException;
@@ -10,6 +11,7 @@ import io.demo.credit.model.security.Users;
 import io.demo.credit.service.UserService;
 import io.demo.credit.util.Messages;
 
+@Validated
 @RestController
 public class CommonController {
 	

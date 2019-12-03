@@ -1,14 +1,21 @@
 package io.demo.credit.service;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.demo.credit.util.Constants;
+import io.demo.credit.jms.CreditProducer;
+import io.demo.credit.model.Account;
 import io.demo.credit.model.CreditApplication;
+import io.demo.credit.model.CreditCard;
 import io.demo.credit.model.UserProfile;
 import io.demo.credit.model.security.Role;
 import io.demo.credit.model.security.Users;
@@ -26,6 +33,18 @@ public class CreditApplicationService {
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private CreditProducer creditProducer;
+	
+	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
+	private CreditCardService creditCardService;
+	
+	@Autowired
+	private Environment environment;
+	
 	/*
 	 * Submit Credit Application
 	 */
@@ -33,43 +52,276 @@ public class CreditApplicationService {
 		
 		LOG.debug("Credit Application Service -> New Application Submitted");
 	
-		app.setApplicationStatus(CreditApplication.APP_STATUS_ACCEPTED);
+		app.setApplicationStatus(Constants.APP_STATUS_ACCEPTED);
+		app.setApplicationStatusDetails("Your application has been accepted by Digital Credit. Once the "
+										+ " application has completed the review process, a response will be"
+										+ " provided concering the approval of your new credit account.");
 		
 		// Set the Application Date
 		app.setApplicationDate(new Date());
 		
 		// save the application
 		creditApplicationRepository.save(app);
+		
+		// Start the application review process in its own process thread
+		ProcessApplication pa = new ProcessApplication(app);
+		Thread thread = new Thread(pa);
+		thread.start();
+	}
+	
+	
+	/*
+	 * Separate thread to process the application in the background
+	 */
+	private class ProcessApplication implements Runnable{
+
+		private CreditApplication app;
+		/*
+		 * Constructor
+		 */
+		ProcessApplication (CreditApplication application){
+			this.app = application;
+		}
+		
+		@Override
+		public void run() {
+			
+			// Add a delay on processing the application
+			Integer delay = Integer.valueOf(20);
+			
+			// try to get the delay setting from the application.properties file
+			try {
+				delay = Integer.valueOf(environment.getProperty(Constants.APP_PROP_CREDIT_APP_TIME));
+			} catch (NumberFormatException nfe) {
+				delay = Integer.valueOf(20);
+			}
+			
+			// Pause execution for delay seconds
+			try {
+				TimeUnit.SECONDS.sleep(delay.intValue());
+			} catch (InterruptedException e) {	
+				e.printStackTrace();
+			}
+			
+			// Process User Data
+			// If the user is defined, check to see if they already have an account
+			// If the user has an account, then reject the application
+			if (processUserData(app)){
+				
+				
+				int totalScore = calculateRiskPoints(app) + calculateDebtToIncomeRatio(app);
+				app.setRiskScore(Long.valueOf(totalScore));
+				
+				// 43 is the highest debt to income ratio to still obtain approval
+				if (totalScore < 44) { 
+					
+					// Approved: Create New Account
+					LOG.debug("Application Approved!");
+					
+					// Determine Credit Limit
+					BigDecimal limit = determineCreditLimit(totalScore);
+					BigDecimal apr = determineApr(app.getCreditScore());
+					Account account = accountService.createAccount(userService.findById(app.getUserId()));
+					CreditCard card = creditCardService.createCreditCard(account, limit, apr);
+					
+					app.setApprovedCreditCard(card);
+					app.setApplicationStatus(Constants.APP_STATUS_APPROVED);
+					
+					String msgDetail = "Thank you for your interest in a Digital Credit card account." 
+							   		 + " Digital Credit has reviewed your application, and it has been"
+							   		 + " approved for a credit line of $" + limit + ".00";
+					
+					if (apr.floatValue() > 0) {
+						msgDetail += " with a qualified APR of " + apr.floatValue() + "%.";
+					} else {
+						msgDetail += " with a qualified introductory APR of 0.0% for the first 15 months.";
+					}
+					
+					app.setApplicationStatusDetails(msgDetail);
+					
+					
+					
+				} else { // Declined
+					
+					LOG.debug("Application Declined!");
+					
+					app.setApplicationStatus(Constants.APP_STATUS_DECLINED);
+					app.setApplicationStatusDetails("Thank you for your interest in a Digital Credit card account."
+							                       + " Digital Credit has reviewed your application, and it was not"
+							   					   + " approved at this time because your debit is too high relative to"
+							                       + " your income in relation to your credit score.");
+				}
+				
+			} else { // Declined
+				
+				LOG.debug("Application Declined: Application data inconsistent with current records.");
+				
+				app.setApplicationStatus(Constants.APP_STATUS_DECLINED);
+				app.setApplicationStatusDetails("The details provided in the application are inconsistent"
+						                       + " with our records. Please contact customer service for further"
+						                       + " assistance.");
+			}
+			
+			creditProducer.sendCreditApplicationStatus(app);
+		
+		} // End Run
+
+		
 	}
 	
 	/*
-	 * Process Credit Application
+	 * Calculate Credit Limit
 	 */
-	public void processCreditApplication (CreditApplication app) {
+	private BigDecimal determineCreditLimit (int score) {
 		
-		// Process User Data
-		processUserData(app);
+		if (score <= 10) {
+			return new BigDecimal(7000);
+		} else if (score <= 20) {
+			return new BigDecimal(5000);
+		} else if (score <= 30) {
+			return new BigDecimal(2500);
+		} else if (score <= 43) {
+			return new BigDecimal(1000);
+		} else {
+			return new BigDecimal(0);
+		}
 		
-		// TDDO
-		// If the user is defined, check to see if they already have an account
-		// If the user has an account, then reject the application
+	}
+	
+	/*
+	 * Calculate APR
+	 */
+	private BigDecimal determineApr (Long score) {
+		
+		if (score >= 800) {
+			return new BigDecimal(0.00);
+		} else if (score >= 740) {
+			return new BigDecimal(16.24);
+		} else if (score >= 670) {
+			return new BigDecimal(20.24);
+		} else if (score >= 580) {
+			return new BigDecimal(24.24);
+		} else {
+			return new BigDecimal(26.24);
+		}
+		
+	}
+	
+	
+	/*
+	 * Generates random credit score from range 300 - 850
+	 * 300-579 - Very Poor
+	 * 580-669 - Fair
+	 * 670-739 - Good
+	 * 740-799 - Very Good
+	 * 800-850 - Exceptional
+	 */
+	private int getCreditScore() {
+		
+		int min = 300;
+		int max = 850;
+		
+		int score = (int) Math.round((Math.random() * ((max - min) + 1)) + min);
+		
+		LOG.debug("Credit Score: " + score);
+		
+		return score;
+	}
+	
+	/*
+	 * Calculates debt to income ration based on submitted criteria
+	 */
+	private int calculateDebtToIncomeRatio(CreditApplication app) {
+		
+		int ratio = 0;
+		
+		float debt = 0;
+		float income = 0;
+		
+		debt += app.getMinimumCreditCard().floatValue();
+		debt += app.getMonthlyAutoLoan().floatValue();
+		debt += app.getMonthlyMortgage().floatValue();
+		debt += app.getMonthlyOtherLoan().floatValue();
+		
+		income = app.getAnnualIncome().floatValue() / 12;
+		
+		ratio = Math.round(debt / income * 100);
+		
+		LOG.debug("Debt to Income Ratio: " + ratio);
+		
+		return ratio;
+	}
+	
+	/*
+	 * Calculates overall risk points based on submitted criteria
+	 */
+	private int calculateRiskPoints(CreditApplication app) {
+		
+		float risk = 0;
+		int score = getCreditScore();
+		app.setCreditScore(Long.valueOf(score));
+		
+		// Employment Status risk
+		switch (app.getEmploymentStatus()) {
+			case(CreditApplication.EMP_ST_EMPLOYED):
+				risk += 0;
+				break;
+			case(CreditApplication.EMP_ST_SELF_EMPLOYED):
+				risk += 1.5;
+				break;
+			case(CreditApplication.EMP_ST_RETIRED):
+				risk += 2.5;
+				break;
+			case(CreditApplication.EMP_ST_STUDENT):
+				risk += 3.5;
+				break;
+			case(CreditApplication.EMP_ST_UNEMPLOYED):
+				risk += 5;
+				break;
+		}
+		
+		// Banking Status risk
+		switch (app.getBankStatus()) {
+			case(CreditApplication.BK_ST_CHK_AND_SAV):
+				risk += 0;
+				break;
+			case(CreditApplication.BK_ST_CHK_ONLY):
+				risk += 1;
+				break;
+			case(CreditApplication.BK_ST_SAV_ONLY):
+				risk += 1;
+				break;
+			case(CreditApplication.BK_ST_NEITHER):
+				risk += 2;
+				break;
+		}
+		
+		// Credit Score risk
+		if (score > 800) { // Exceptional
+			risk += 0;
+		} else if (score > 740) { // Very Good
+			risk += 1;
+		} else if (score > 670) { // Good
+			risk += 3;
+		} else if (score > 580) { // Fair
+			risk += 7;
+		} else { // Very Poor
+			risk += 10;
+		}
 		
 		
-		// Determine criteria from Application to determine level of acceptance. i.e. analogous to credit rating
-		// use criteria to determine accept or reject of application
+		LOG.debug("Risk Score: " + Math.round(risk));
 		
-		
+		return Math.round(risk);
 	}
 	
 	/*
 	 * Determine existing user or a new user
 	 */
-	private void processUserData (CreditApplication app) {
+	private boolean processUserData (CreditApplication app) {
 		
 		Users user;
-		boolean bDenied = false;
-		String deniedMsg = "";
-		
+		boolean bApplicantOk = true;
 		
 		// Check to see if the user already exists
 		if (userService.checkEmailAdressExists(app.getEmailAddress()) || userService.checkSsnExists(app.getSsn())) { 
@@ -79,13 +331,7 @@ public class CreditApplicationService {
 			
 			// Check SSN matches the provided SSN on the application
 			if (!user.getUserProfile().getSsn().equals(userService.normalizeSSNFormat(app.getSsn()))) {
-				
-				deniedMsg = "Email Address and Social Security Number provided are not consistent and in direct conflict "
-						  + "with existing accounts in the pur system. Contact customer service for further assistance.";
-				
-				LOG.debug(deniedMsg);
-				
-				bDenied = true;
+				bApplicantOk = false;
 			}
 			
 			LOG.debug("Process Credit Application -> Get existing user with email '" + user.getUserProfile().getEmailAddress() + "'");
@@ -94,7 +340,7 @@ public class CreditApplicationService {
 		else { // User does not exist in the system
 			
 			// Create user account
-			user = new Users (app.getEmailAddress(), "password");
+			user = new Users (app.getEmailAddress(), "Demo123!");
 			UserProfile profile = new UserProfile();
 			
 			// Fill the User Profile with the Application details
@@ -128,17 +374,13 @@ public class CreditApplicationService {
 			
 			LOG.debug("Process Credit Application -> Created new user '" + user.getUserProfile().getEmailAddress() + "'");
 		}
-		
-		// Set the Application status
-		if (bDenied) {
-			app.setApplicationStatus(CreditApplication.APP_STATUS_DENIED);
-			app.setReason(deniedMsg);
-		}
-		
+				
 		// Set the user Id for the user of the application
 		app.setUserId(user.getId());
 		
 		creditApplicationRepository.save(app);
+		
+		return bApplicantOk;
 		
 	}
 }

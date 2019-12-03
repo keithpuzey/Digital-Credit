@@ -3,28 +3,33 @@ package io.demo.credit.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-
+import javax.validation.constraints.PositiveOrZero;
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-
 import io.demo.credit.util.Messages;
 import io.demo.credit.util.Patterns;
 
 @Entity
 public class CreditApplication {
+	
+	// Message Correlation
+	private String correlationId;
 	
 	// Banking Status
 	public static final String BK_ST_CHK_AND_SAV 		= "Checking and Savings";
@@ -39,24 +44,22 @@ public class CreditApplication {
 	public static final String EMP_ST_STUDENT 			= "Student";
 	public static final String EMP_ST_UNEMPLOYED 		= "Unemployed";
 	
-	// Credit Application Status
-	public static final String APP_STATUS_ACCEPTED		= "Accepted";
-	public static final String APP_STATUS_DENIED		= "Denied";
-	public static final String APP_STATUS_IN_PROCESS	= "In Process";
-	public static final String APP_STATUS_COMPLETE		= "Complete";
-	
-	
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	@Column(nullable=false, updatable=false)
 	@JsonProperty (access = Access.READ_ONLY)
 	private Long id;
 	
+	@OneToOne (cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "application_number")
+	@JsonProperty (access = Access.READ_ONLY)
+	private ApplicationNumberSeq applicationNumber;
+	
 	@JsonProperty (access = Access.READ_ONLY)
 	private String applicationStatus;
 	
 	@JsonProperty (access = Access.READ_ONLY)
-	private String reason;
+	private String applicationStatusDetails;
 	
 	@JsonProperty (access = Access.READ_ONLY)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern=Patterns.DATE_FORMAT)
@@ -129,11 +132,20 @@ public class CreditApplication {
 	@Pattern(regexp=Patterns.APP_BANK_STATUS, message=Messages.APP_BANK_STATUS_FORMAT)
 	private String bankStatus;
 	
-	@Positive (message=Messages.APP_ANNUAL_INCOME)
+	@PositiveOrZero (message=Messages.APP_ANNUAL_INCOME)
 	private BigDecimal annualIncome;
 	
-	@Positive (message=Messages.APP_MONTHLY_MORTGAGE)
+	@PositiveOrZero (message=Messages.APP_MONTHLY_MORTGAGE)
 	private BigDecimal monthlyMortgage;
+	
+	@PositiveOrZero (message=Messages.APP_MONTHLY_AUTO_LOAN)
+	private BigDecimal monthlyAutoLoan;
+	
+	@PositiveOrZero (message=Messages.APP_MONTHLY_CREDIT_CARD)
+	private BigDecimal minimumCreditCard;
+	
+	@PositiveOrZero (message=Messages.APP_MONTHLY_OTHER_LOAN)
+	private BigDecimal monthlyOtherLoan;
 	
 	private BigDecimal monthlySpend = BigDecimal.ZERO;
 	private boolean cashAdvance = false;
@@ -142,30 +154,52 @@ public class CreditApplication {
 	@AssertTrue (message=Messages.APP_AGREE_TERMS)
 	private boolean agreeTerms;
 	
+	@JsonProperty (access = Access.READ_ONLY)
+	private Long riskScore;
+	
+	@JsonProperty (access = Access.READ_ONLY)
+	private Long creditScore;
+	
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "approved_card_id")
+	@JsonProperty (access = Access.READ_ONLY)
+	private CreditCard approvedCreditCard;
+	
 	/*
 	 * Empty Application
 	 */
-	public CreditApplication(){}
+	public CreditApplication(){
+		applicationNumber = new ApplicationNumberSeq();
+	}
 	
 	/*
-	 * Prefilled Application
+	 * Pre-filled Application
 	 */
 	public CreditApplication(UserProfile profile){
 		
-		this.firstName = profile.getFirstName();
-		this.lastName = profile.getLastName();
-		this.ssn = profile.getSsn();
-		this.dob = profile.getDob();
-		this.homePhone = profile.getHomePhone();
-		this.workPhone = profile.getWorkPhone();
-		this.mobilePhone = profile.getMobilePhone();
-		this.address = profile.getAddress();
-		this.locality = profile.getLocality();
-		this.region = profile.getRegion();
-		this.postalCode = profile.getPostalCode();
-		this.emailAddress = profile.getEmailAddress();
+		applicationNumber = new ApplicationNumberSeq();
+		firstName = profile.getFirstName();
+		lastName = profile.getLastName();
+		ssn = profile.getSsn();
+		dob = profile.getDob();
+		homePhone = profile.getHomePhone();
+		workPhone = profile.getWorkPhone();
+		mobilePhone = profile.getMobilePhone();
+		address = profile.getAddress();
+		locality = profile.getLocality();
+		region = profile.getRegion();
+		postalCode = profile.getPostalCode();
+		emailAddress = profile.getEmailAddress();
 	}
 	
+	
+	/**
+	 * @return the applicationNumber
+	 */
+	public Long getApplicationNumber() {
+		return applicationNumber.getId();
+	}
+
 	/**
 	 * @return the employmentStatus
 	 */
@@ -506,19 +540,115 @@ public class CreditApplication {
 	}
 
 	/**
-	 * @return the reason
+	 * @return the monthlyAutoLoan
 	 */
-	public String getReason() {
-		return reason;
+	public BigDecimal getMonthlyAutoLoan() {
+		return monthlyAutoLoan;
 	}
 
 	/**
-	 * @param reason the reason to set
+	 * @param monthlyAutoLoan the monthlyAutoLoan to set
 	 */
-	@JsonIgnore
-	public void setReason(String reason) {
-		this.reason = reason;
+	public void setMonthlyAutoLoan(BigDecimal monthlyAutoLoan) {
+		this.monthlyAutoLoan = monthlyAutoLoan;
 	}
-	
+
+	/**
+	 * @return the minimumCreditCard
+	 */
+	public BigDecimal getMinimumCreditCard() {
+		return minimumCreditCard;
+	}
+
+	/**
+	 * @param minimumCreditCard the minimumCreditCard to set
+	 */
+	public void setMinimumCreditCard(BigDecimal minimumCreditCard) {
+		this.minimumCreditCard = minimumCreditCard;
+	}
+
+	/**
+	 * @return the monthlyOtherLoan
+	 */
+	public BigDecimal getMonthlyOtherLoan() {
+		return monthlyOtherLoan;
+	}
+
+	/**
+	 * @param monthlyOtherLoan the monthlyOtherLoan to set
+	 */
+	public void setMonthlyOtherLoan(BigDecimal monthlyOtherLoan) {
+		this.monthlyOtherLoan = monthlyOtherLoan;
+	}
+
+	/**
+	 * @return the correlationId
+	 */
+	public String getCorrelationId() {
+		return correlationId;
+	}
+
+	/**
+	 * @param correlationId the correlationId to set
+	 */
+	public void setCorrelationId(String correlationId) {
+		this.correlationId = correlationId;
+	}
+
+	/**
+	 * @return the riskScore
+	 */
+	public Long getRiskScore() {
+		return riskScore;
+	}
+
+	/**
+	 * @param riskScore the riskScore to set
+	 */
+	public void setRiskScore(Long riskScore) {
+		this.riskScore = riskScore;
+	}
+
+	/**
+	 * @return the creditScore
+	 */
+	public Long getCreditScore() {
+		return creditScore;
+	}
+
+	/**
+	 * @param creditScore the creditScore to set
+	 */
+	public void setCreditScore(Long creditScore) {
+		this.creditScore = creditScore;
+	}
+
+	/**
+	 * @return the applicationStatusDetails
+	 */
+	public String getApplicationStatusDetails() {
+		return applicationStatusDetails;
+	}
+
+	/**
+	 * @param applicationStatusDetails the applicationStatusDetails to set
+	 */
+	public void setApplicationStatusDetails(String applicationStatusDetails) {
+		this.applicationStatusDetails = applicationStatusDetails;
+	}
+
+	/**
+	 * @return the approvedCreditCard
+	 */
+	public CreditCard getApprovedCreditCard() {
+		return approvedCreditCard;
+	}
+
+	/**
+	 * @param approvedCreditCard the approvedCreditCard to set
+	 */
+	public void setApprovedCreditCard(CreditCard approvedCreditCard) {
+		this.approvedCreditCard = approvedCreditCard;
+	}
 	
 }

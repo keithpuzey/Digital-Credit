@@ -75,6 +75,9 @@ public class Messages {
 														+ CreditApplication.EMP_ST_UNEMPLOYED + "'";
 	public static final String APP_ANNUAL_INCOME		= "Annual Income must be a positive number";
 	public static final String APP_MONTHLY_MORTGAGE		= "Monthly Mortgage must be a positive number";
+	public static final String APP_MONTHLY_AUTO_LOAN	= "Monthly Auto Loan Payment(s) must be a positive number";
+	public static final String APP_MONTHLY_OTHER_LOAN   = "Monthly Other Loan Payment(s) must be a positive number";
+	public static final String APP_MONTHLY_CREDIT_CARD	= "Monthly Minimum Credit Card Payment(s) must be a positive number";
 	public static final String APP_AGREE_TERMS			= "You must agree to the terms";
 	
 	

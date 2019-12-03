@@ -4,6 +4,28 @@ import io.demo.credit.util.Patterns;
 
 public class Constants {
 	
+	// Application Configuration Properties
+	public static final String APP_PROP_CREDIT_APP_TIME		= "io.demo.credit.app.process.time";
+	
+	
+	// Institution Identification Numbers
+	public static final String ID_VISA_BIN					= "437826";
+	
+	// Credit Application
+	public static final String APP_STATUS_SUBMITTED			= "Submitted";
+	public static final String APP_STATUS_ACCEPTED			= "Accepted";
+	public static final String APP_STATUS_DECLINED			= "Declined";
+	public static final String APP_STATUS_APPROVED			= "Approved";
+	
+	// Constants for message attributes
+	public static final String STATUS_ATT_APP_ID 			= "Id";
+	public static final String STATUS_ATT_APP_NO 			= "Number";
+	public static final String STATUS_ATT_APP_STATUS 		= "Status";
+	public static final String STATUS_ATT_APP_STATUS_DETAIL = "StatusDetail";
+	public static final String STATUS_ATT_APP_CREDIT_SCORE  = "CreditScore";
+	public static final String STATUS_ATT_APP_RISK_SCORE    = "RiskScore";
+	public static final String STATUS_ATT_APP_CREDIT_ID 	= "approvedCardId";
+	public static final String STATUS_ATT_APP_CREDIT_APR 	= "approvedCardApr";
 	
 	// Directives
 	public static final String DIR_REDIRECT 				= "redirect:";
@@ -56,5 +78,6 @@ public class Constants {
 	public static final String URI_API_USR_UNLOCK			= "/api/v1/user/{id}/state/unlock";
 	public static final String URI_API_USR_PASS_UNEXPIRE	= "/api/v1/user/{id}/password/unexpire";
 	public static final String URI_API_CREDIT_APPLICATION	= "/api/v1/credit/application";
+	public static final String URI_API_CREDIT_CARD			= "/api/v1/credit/card/{id}";
 
 }

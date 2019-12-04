@@ -30,6 +30,8 @@ public class CreditController extends CommonController{
 	@GetMapping (Constants.URI_API_CREDIT_CARD)
 	public ResponseEntity<?> getCreditCard(@PathVariable(Constants.PATH_VARIABLE_ID) Long id){
 		
+		LOG.debug("Get Credit Card with id = " + id);
+		
 		CreditCard card = creditCardService.getCreditCard(id);
 		
 		if (card != null) {

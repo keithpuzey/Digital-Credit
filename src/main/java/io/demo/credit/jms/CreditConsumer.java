@@ -27,8 +27,6 @@ public class CreditConsumer {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CreditConsumer.class);
 	
-	
-	
 	@Autowired
 	private CreditApplicationService creditApplicationService; 
 	
@@ -41,7 +39,7 @@ public class CreditConsumer {
 	 */
 	@JmsListener(destination = "${io.demo.partner.credit.app.request}")
 	@SendTo("${io.demo.partner.credit.app.response}")
-	public String recieveCreditApplication(String application, @Header(JmsHeaders.MESSAGE_ID) String correlationId) throws JMSException {
+	public String recieveCreditApplication(String application, @Header(JmsHeaders.CORRELATION_ID) String correlationId) throws JMSException {
 		
 		LOG.debug("New Credit Application Recieved -> " + application);
 		LOG.debug("Application Correlation Id: " + correlationId);

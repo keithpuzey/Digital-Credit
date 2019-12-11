@@ -55,6 +55,11 @@ public class Billing {
 		this.card = card;
 	}
 	
+	/*
+	 * Default Constructor
+	 */
+	public Billing () {}
+	
 	/**
 	 * @return the id
 	 */

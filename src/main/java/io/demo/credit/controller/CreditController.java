@@ -41,6 +41,40 @@ public class CreditController extends CommonController{
 		}
 	}
 	
+	/*
+	 * Get credit billing by card id
+	 */
+	@GetMapping (Constants.URI_API_BILLING_DETAIL)
+	public ResponseEntity<?> getBillingDetails(@PathVariable(Constants.PATH_VARIABLE_ID) Long id){
+		
+		LOG.debug("Get Credit Card with id = " + id);
+		
+		CreditCard card = creditCardService.getCreditCard(id);
+		
+		if (card != null) {
+			return ResponseEntity.ok(creditCardService.getCardBillingDetail(card));
+		} else {
+			throw new RestObjectNotFoundException (Messages.OBJECT_NOT_FOUND + id);
+		}	
+	}
+	
+	/*
+	 * Get credit card transactions by card id
+	 */
+	@GetMapping (Constants.URI_API_CREDIT_TRANS)
+	public ResponseEntity<?> getCreditTransactions(@PathVariable(Constants.PATH_VARIABLE_ID) Long id){
+		
+		LOG.debug("Get Credit Card with id = " + id);
+		
+		CreditCard card = creditCardService.getCreditCard(id);
+		
+		if (card != null) {
+			return ResponseEntity.ok(card.getCreditTransactionList());
+		} else {
+			throw new RestObjectNotFoundException (Messages.OBJECT_NOT_FOUND + id);
+		}
+	}
+	
 	
 	
 }

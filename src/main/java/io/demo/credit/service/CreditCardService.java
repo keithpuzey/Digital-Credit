@@ -13,11 +13,17 @@ import io.demo.credit.model.AuthorizedUsers;
 import io.demo.credit.model.Billing;
 import io.demo.credit.model.BillingAddress;
 import io.demo.credit.model.CreditCard;
+import io.demo.credit.model.TransactionCategory;
+import io.demo.credit.model.TransactionState;
+import io.demo.credit.model.TransactionType;
 import io.demo.credit.model.UserProfile;
 import io.demo.credit.model.security.Users;
 import io.demo.credit.repository.BillingAddressRepository;
 import io.demo.credit.repository.BillingRepository;
 import io.demo.credit.repository.CreditCardRepository;
+import io.demo.credit.repository.TransactionCategoryRepository;
+import io.demo.credit.repository.TransactionStateRepository;
+import io.demo.credit.repository.TransactionTypeRepository;
 import io.demo.credit.util.Constants;
 
 @Service
@@ -33,6 +39,15 @@ public class CreditCardService {
 	@Autowired
 	private BillingRepository billingRepository;
 	
+	@Autowired
+	private TransactionCategoryRepository transactionCategoryRepository;
+	
+	@Autowired
+	private TransactionStateRepository transactionStateRepository;
+	
+	@Autowired
+	private TransactionTypeRepository transactionTypeRepository;
+	
 	private Random random = new Random(System.currentTimeMillis());
 	
 	public CreditCard getCreditCard (Long id) {
@@ -45,6 +60,16 @@ public class CreditCardService {
 			return null;
 		}
 	}
+	
+	/*
+	 * Return Credit Card Billing Detail
+	 */
+	public Billing getCardBillingDetail (CreditCard card) {
+		Billing bill = billingRepository.findByCardId(card.getId());
+		
+		return bill;
+	}
+	
 	
 	public CreditCard createCreditCard(Account account, BigDecimal limit, BigDecimal apr) {
 		
@@ -71,6 +96,8 @@ public class CreditCardService {
 		creditCard.setDateExpire(dateExpire);
 		creditCard.setCardNumber(generateCardNumber(Constants.ID_VISA_BIN, 16));
 		creditCard.setCvv(generateCvv(3));
+		creditCard.setCurrentBalance(new BigDecimal(0));
+		creditCard.setAvailableBalance(limit);
 		
 		// Save Credit Card
 		creditCardRepository.save(creditCard);
@@ -101,9 +128,30 @@ public class CreditCardService {
 		
 		// Setup Authorized Users
 		addAuthorizedUser(creditCard, creditCard.getCardHolder());
-		
+				
 		return creditCard;
 		
+	}
+	
+	/*
+	 * Get Transaction Category by Code
+	 */
+	public TransactionCategory getTransactionCategory(String code) {
+		return transactionCategoryRepository.findByCode(code);
+	}
+	
+	/*
+	 * Get Transaction State by Code
+	 */
+	public TransactionState getTransactionState(String code) {
+		return transactionStateRepository.findByCode(code);
+	}
+	
+	/*
+	 * Get Transaction Type by Code
+	 */
+	public TransactionType getTransactionType(String code) {
+		return transactionTypeRepository.findByCode(code);
 	}
 	
 	/*

@@ -79,5 +79,7 @@ public class Constants {
 	public static final String URI_API_USR_PASS_UNEXPIRE	= "/api/v1/user/{id}/password/unexpire";
 	public static final String URI_API_CREDIT_APPLICATION	= "/api/v1/credit/application";
 	public static final String URI_API_CREDIT_CARD			= "/api/v1/credit/card/{id}";
+	public static final String URI_API_BILLING_DETAIL		= "/api/v1/credit/card/{id}/billing";
+	public static final String URI_API_CREDIT_TRANS			= "/api/v1/credit/card/{id}/transactions";
 
 }

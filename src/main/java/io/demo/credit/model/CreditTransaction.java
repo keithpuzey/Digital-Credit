@@ -2,20 +2,27 @@ package io.demo.credit.model;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 
 @Entity
-public class CardTransactions {
+public class CreditTransaction {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
@@ -25,8 +32,10 @@ public class CardTransactions {
 	private BigDecimal amount;
 	private BigDecimal runningBalance;
 	
-	@Column(name="transactionNumber", nullable=false, unique=true)
-	private Long transactionNumber;
+	@OneToOne (cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "transaction_number")
+	@JsonProperty (access = Access.READ_ONLY)
+	private TransactionNumberSeq transactionNumber;
 
 	
 	@JsonFormat(pattern="yyyy-MM-dd'T'hh:mm")
@@ -43,6 +52,16 @@ public class CardTransactions {
 	
 	@ManyToOne
     private TransactionState transactionState;
+	
+	@ManyToOne
+    private TransactionCategory transactionCategory;
+	
+	/*
+	 * Constructor
+	 */
+	public CreditTransaction () {
+		transactionNumber = new TransactionNumberSeq();
+	}
 
 	/**
 	 * @return the id
@@ -146,14 +165,7 @@ public class CardTransactions {
 	 * @return the transactionNumber
 	 */
 	public Long getTransactionNumber() {
-		return transactionNumber;
-	}
-
-	/**
-	 * @param transactionNumber the transactionNumber to set
-	 */
-	public void setTransactionNumber(Long transactionNumber) {
-		this.transactionNumber = transactionNumber;
+		return transactionNumber.getId();
 	}
 
 	/**
@@ -169,4 +181,20 @@ public class CardTransactions {
 	public void setCard(CreditCard card) {
 		this.card = card;
 	}
+
+	/**
+	 * @return the transactionCategory
+	 */
+	public TransactionCategory getTransactionCategory() {
+		return transactionCategory;
+	}
+
+	/**
+	 * @param transactionCategory the transactionCategory to set
+	 */
+	public void setTransactionCategory(TransactionCategory transactionCategory) {
+		this.transactionCategory = transactionCategory;
+	}
+	
+	
 }

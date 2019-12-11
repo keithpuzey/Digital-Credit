@@ -2,6 +2,7 @@ package io.demo.credit.model;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.validation.constraints.Digits;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -52,6 +54,13 @@ public class CreditCard {
 	
 	private BigDecimal creditLimit;
 	private BigDecimal apr;
+	private BigDecimal currentBalance;
+	private BigDecimal availableBalance;
+	
+	@OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OrderBy("transaction_date DESC")
+    @JsonIgnore
+    private List<CreditTransaction> creditTransactionList;
 	
 
 	/**
@@ -186,7 +195,47 @@ public class CreditCard {
 	public void setApr(BigDecimal apr) {
 		this.apr = apr;
 	}
-	
-	
+
+	/**
+	 * @return the currentBalance
+	 */
+	public BigDecimal getCurrentBalance() {
+		return currentBalance;
+	}
+
+	/**
+	 * @param currentBalance the currentBalance to set
+	 */
+	public void setCurrentBalance(BigDecimal currentBalance) {
+		this.currentBalance = currentBalance;
+	}
+
+	/**
+	 * @return the availableBalance
+	 */
+	public BigDecimal getAvailableBalance() {
+		return availableBalance;
+	}
+
+	/**
+	 * @param availableBalance the availableBalance to set
+	 */
+	public void setAvailableBalance(BigDecimal availableBalance) {
+		this.availableBalance = availableBalance;
+	}
+
+	/**
+	 * @return the creditTransactionList
+	 */
+	public List<CreditTransaction> getCreditTransactionList() {
+		return creditTransactionList;
+	}
+
+	/**
+	 * @param creditTransactionList the creditTransactionList to set
+	 */
+	public void setCreditTransactionList(List<CreditTransaction> creditTransactionList) {
+		this.creditTransactionList = creditTransactionList;
+	}
 		
 }

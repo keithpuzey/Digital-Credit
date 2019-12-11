@@ -13,7 +13,6 @@ public class TransactionType {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE)
 	@Column(name="id", nullable=false, updatable=false)
 	private Long id;
-	
 	private String code;
 	private String name;
 	private String category;

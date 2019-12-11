@@ -53,9 +53,10 @@ public class CreditApplicationService {
 		LOG.debug("Credit Application Service -> New Application Submitted");
 	
 		app.setApplicationStatus(Constants.APP_STATUS_ACCEPTED);
-		app.setApplicationStatusDetails("Your application has been accepted by Digital Credit. Once the "
-										+ " application has completed the review process, a response will be"
-										+ " provided concering the approval of your new credit account.");
+		app.setApplicationStatusDetails("Thank you for your interest in a Digital Credit account."
+										+ " Your application has been accepted. Once your "
+										+ " application has completed the review process, you will recieve"
+										+ " an update from the credit review team.");
 		
 		// Set the Application Date
 		app.setApplicationDate(new Date());
@@ -127,9 +128,9 @@ public class CreditApplicationService {
 					app.setApprovedCreditCard(card);
 					app.setApplicationStatus(Constants.APP_STATUS_APPROVED);
 					
-					String msgDetail = "Thank you for your interest in a Digital Credit card account." 
+					String msgDetail = "Thank you for your interest in a Digital Credit account." 
 							   		 + " Digital Credit has reviewed your application, and it has been"
-							   		 + " approved for a credit line of $" + limit + ".00";
+							   		 + " approved for a new credit line of $" + limit + ".00";
 					
 					if (apr.floatValue() > 0) {
 						msgDetail += " with a qualified APR of " + apr.floatValue() + "%.";
@@ -146,7 +147,7 @@ public class CreditApplicationService {
 					LOG.debug("Application Declined!");
 					
 					app.setApplicationStatus(Constants.APP_STATUS_DECLINED);
-					app.setApplicationStatusDetails("Thank you for your interest in a Digital Credit card account."
+					app.setApplicationStatusDetails("Thank you for your interest in a Digital Credit account."
 							                       + " Digital Credit has reviewed your application, and it was not"
 							   					   + " approved at this time because your debit is too high relative to"
 							                       + " your income in relation to your credit score.");
@@ -157,9 +158,11 @@ public class CreditApplicationService {
 				LOG.debug("Application Declined: Application data inconsistent with current records.");
 				
 				app.setApplicationStatus(Constants.APP_STATUS_DECLINED);
-				app.setApplicationStatusDetails("The details provided in the application are inconsistent"
-						                       + " with our records. Please contact customer service for further"
-						                       + " assistance.");
+				app.setApplicationStatusDetails("Thank you for your interest in a Digital Credit account."
+												+ " Digital Credit has reviewed your application, and it was not"
+												+ " approved at this time because the details provided in the application"
+												+ " are inconsistent with our records. Please contact customer service for further"
+												+ " assistance.");
 			}
 			
 			creditProducer.sendCreditApplicationStatus(app);

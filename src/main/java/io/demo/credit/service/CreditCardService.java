@@ -2,9 +2,13 @@ package io.demo.credit.service;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +22,7 @@ import io.demo.credit.model.TransactionState;
 import io.demo.credit.model.TransactionType;
 import io.demo.credit.model.UserProfile;
 import io.demo.credit.model.security.Users;
+import io.demo.credit.repository.AuthorizedUsersRepository;
 import io.demo.credit.repository.BillingAddressRepository;
 import io.demo.credit.repository.BillingRepository;
 import io.demo.credit.repository.CreditCardRepository;
@@ -29,6 +34,8 @@ import io.demo.credit.util.Constants;
 @Service
 @Transactional
 public class CreditCardService {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CreditCardService.class);
 	
 	@Autowired
 	private CreditCardRepository creditCardRepository;
@@ -48,8 +55,21 @@ public class CreditCardService {
 	@Autowired
 	private TransactionTypeRepository transactionTypeRepository;
 	
+	@Autowired
+	private AuthorizedUsersRepository authorizedUsersRepository;
+	
 	private Random random = new Random(System.currentTimeMillis());
 	
+	/*
+	 * Get All Credit Cards
+	 */
+	public List<CreditCard> getCreditCards () {
+		return creditCardRepository.findAll();
+	}
+	
+	/*
+	 * Get Credit Card by Id
+	 */
 	public CreditCard getCreditCard (Long id) {
 		Optional<CreditCard> card = creditCardRepository.findById(id);
 		
@@ -68,6 +88,30 @@ public class CreditCardService {
 		Billing bill = billingRepository.findByCardId(card.getId());
 		
 		return bill;
+	}
+	
+	/*
+	 * Delete Credit Card
+	 */
+	public void deleteCreditCard (CreditCard card) {
+		
+		// Delete Billing Details
+		LOG.debug("Delete Credit Card: Delete Billing Details.");
+		Billing bill = billingRepository.findByCardId(card.getId());
+		billingRepository.delete(bill);
+		
+		// Delete Billing Address Details
+		LOG.debug("Delete Credit Card: Delete Billing Address Details.");
+		BillingAddress billingAddress = billingAddressRepository.findByCardId(card.getId());
+		billingAddressRepository.delete(billingAddress);
+		
+		// Remove Authorized Users
+		LOG.debug("Delete Credit Card: Delete Authorized Users");
+		removeAllAuthorizedUsers(card);
+		
+		// Delete Credit Card
+		LOG.debug("Delete Credit Card: Delete Credit Card Details.");
+		creditCardRepository.delete(card);
 	}
 	
 	
@@ -166,6 +210,28 @@ public class CreditCardService {
 		authorizedUsers.add(authorizedUser);
 		
 		creditCardRepository.save(card);
+	}
+	
+	/*
+	 * Remove Authorized User
+	 */
+	public void removeAuthorizedUser (CreditCard card, Users user) {
+		
+		Set<AuthorizedUsers> authorizedUsers = card.getAuthorizedUsers();
+		
+		AuthorizedUsers authorizedUser = new AuthorizedUsers(user, card);
+		
+		authorizedUsers.remove(authorizedUser);
+		
+		creditCardRepository.save(card);
+	}
+	
+	/*
+	 * Remove all Authorized Users
+	 */
+	public void removeAllAuthorizedUsers (CreditCard card) {
+		
+		authorizedUsersRepository.deleteByCardId(card.getId());
 	}
 	
 	/*

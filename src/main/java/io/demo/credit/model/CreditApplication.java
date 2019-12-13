@@ -160,10 +160,8 @@ public class CreditApplication {
 	@JsonProperty (access = Access.READ_ONLY)
 	private Long creditScore;
 	
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinColumn(name = "approved_card_id")
 	@JsonProperty (access = Access.READ_ONLY)
-	private CreditCard approvedCreditCard;
+	private Long approvedCardId;
 	
 	/*
 	 * Empty Application
@@ -638,17 +636,17 @@ public class CreditApplication {
 	}
 
 	/**
-	 * @return the approvedCreditCard
+	 * @return the approvedCardId
 	 */
-	public CreditCard getApprovedCreditCard() {
-		return approvedCreditCard;
+	public Long getApprovedCardId() {
+		return approvedCardId;
 	}
 
 	/**
-	 * @param approvedCreditCard the approvedCreditCard to set
+	 * @param approvedCardId the approvedCardId to set
 	 */
-	public void setApprovedCreditCard(CreditCard approvedCreditCard) {
-		this.approvedCreditCard = approvedCreditCard;
+	public void setApprovedCardId(Long approvedCardId) {
+		this.approvedCardId = approvedCardId;
 	}
 	
 }

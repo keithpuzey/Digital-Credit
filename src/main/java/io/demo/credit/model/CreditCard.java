@@ -15,6 +15,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Digits;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -40,6 +44,7 @@ public class CreditCard {
 	private Users cardHolder;
 	
 	@JsonIgnore
+	@OnDelete(action = OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<AuthorizedUsers> authorizedUsers = new HashSet<>();
 	
@@ -57,6 +62,7 @@ public class CreditCard {
 	private BigDecimal currentBalance;
 	private BigDecimal availableBalance;
 	
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	@OneToMany(mappedBy = "card", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@OrderBy("transaction_date DESC")
     @JsonIgnore

@@ -49,16 +49,16 @@ public class Billing {
 	private BigDecimal lastPaymentMade;
 	
 	/*
+	 * Default Constructor
+	 */
+	public Billing() {}
+	
+	/*
 	 * Constructor
 	 */
 	public Billing (CreditCard card) {
 		this.card = card;
 	}
-	
-	/*
-	 * Default Constructor
-	 */
-	public Billing () {}
 	
 	/**
 	 * @return the id

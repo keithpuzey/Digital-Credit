@@ -1,5 +1,7 @@
 package io.demo.credit.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -7,7 +9,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
 import io.demo.credit.exception.RestBadRequestException;
 import io.demo.credit.exception.RestObjectNotFoundException;
+import io.demo.credit.model.CreditApplication;
+import io.demo.credit.model.CreditCard;
 import io.demo.credit.model.security.Users;
+import io.demo.credit.service.CreditApplicationService;
+import io.demo.credit.service.CreditCardService;
 import io.demo.credit.service.UserService;
 import io.demo.credit.util.Messages;
 
@@ -15,8 +21,16 @@ import io.demo.credit.util.Messages;
 @RestController
 public class CommonController {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(CommonController.class);
+	
 	@Autowired
 	UserService userService;
+	
+	@Autowired
+	CreditCardService creditCardService;
+	
+	@Autowired
+	private CreditApplicationService creditApplicationService;
 	
 	
 	/*
@@ -52,6 +66,46 @@ public class CommonController {
 	 */
 	public boolean hasRole(Users user, String roleName) {
 		return userService.hasRole(user, roleName);
+	}
+	
+	/*
+	 * Find the credit card by Id
+	 */
+	public CreditCard getCreditCardById(Long id) {
+		
+		LOG.debug("Get Credit Card with id = " + id);
+		
+		if (id < 0) {
+			throw new RestBadRequestException (Messages.INVALID_OBJECT_ID);
+		}
+	
+		CreditCard card = creditCardService.getCreditCard(id);
+		
+		if (card == null) {
+			throw new RestObjectNotFoundException (Messages.OBJECT_NOT_FOUND + id);
+		}
+		
+		return card;
+	}
+	
+	/*
+	 * Find the credit application by Id
+	 */
+	public CreditApplication getCreditApplicationById(Long id) {
+		
+		LOG.debug("Get Credit Application with id = " + id);
+		
+		if (id < 0) {
+			throw new RestBadRequestException (Messages.INVALID_OBJECT_ID);
+		}
+	
+		CreditApplication app = creditApplicationService.getCreditApplication(id);
+		
+		if (app == null) {
+			throw new RestObjectNotFoundException (Messages.OBJECT_NOT_FOUND + id);
+		}
+		
+		return app;
 	}
 	
 	

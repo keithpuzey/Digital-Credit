@@ -8,6 +8,7 @@ import io.demo.credit.model.BillingAddress;
 public interface BillingAddressRepository extends CrudRepository<BillingAddress, Long> {
 	
 	List<BillingAddress> findAll();
+	BillingAddress findByCardId(Long id);
 	
 
 }

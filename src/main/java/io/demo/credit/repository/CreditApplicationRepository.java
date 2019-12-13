@@ -1,6 +1,8 @@
 package io.demo.credit.repository;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.repository.CrudRepository;
 import io.demo.credit.model.CreditApplication;
 
@@ -8,5 +10,7 @@ import io.demo.credit.model.CreditApplication;
 public interface CreditApplicationRepository extends CrudRepository<CreditApplication, Long> {
 	
 	List<CreditApplication> findAll ();
+	
+	Optional<CreditApplication> findById(Long id);
 
 }

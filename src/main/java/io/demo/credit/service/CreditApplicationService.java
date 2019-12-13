@@ -1,7 +1,10 @@
 package io.demo.credit.service;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -45,6 +48,35 @@ public class CreditApplicationService {
 	@Autowired
 	private Environment environment;
 	
+	
+	/*
+	 * Delete Credit Application
+	 */
+	public void deleteCreditApplication (CreditApplication app) {
+		creditApplicationRepository.delete(app);
+	}
+	
+	/*
+	 * Get All Credit Applications
+	 */
+	public List<CreditApplication> getCreditApplications (){
+		return creditApplicationRepository.findAll();
+	}
+	
+	/*
+	 * Get Credit Application
+	 */
+	public CreditApplication getCreditApplication (Long id) {
+		Optional<CreditApplication> app = creditApplicationRepository.findById(id);
+		
+		if (app.isPresent()) {
+			return app.get();
+			
+		} else {
+			return null;
+		}
+	}
+	
 	/*
 	 * Submit Credit Application
 	 */
@@ -53,10 +85,7 @@ public class CreditApplicationService {
 		LOG.debug("Credit Application Service -> New Application Submitted");
 	
 		app.setApplicationStatus(Constants.APP_STATUS_ACCEPTED);
-		app.setApplicationStatusDetails("Thank you for your interest in a Digital Credit account."
-										+ " Your application has been accepted. Once your "
-										+ " application has completed the review process, you will recieve"
-										+ " an update from the credit review team.");
+		app.setApplicationStatusDetails(Constants.APP_STATUS_ACCEPTED_DETAIL);
 		
 		// Set the Application Date
 		app.setApplicationDate(new Date());
@@ -125,17 +154,15 @@ public class CreditApplicationService {
 					Account account = accountService.createAccount(userService.findById(app.getUserId()));
 					CreditCard card = creditCardService.createCreditCard(account, limit, apr);
 					
-					app.setApprovedCreditCard(card);
+					app.setApprovedCardId(card.getId());
 					app.setApplicationStatus(Constants.APP_STATUS_APPROVED);
 					
-					String msgDetail = "Thank you for your interest in a Digital Credit account." 
-							   		 + " Digital Credit has reviewed your application, and it has been"
-							   		 + " approved for a new credit line of $" + limit + ".00";
+					String msgDetail;
 					
 					if (apr.floatValue() > 0) {
-						msgDetail += " with a qualified APR of " + apr.floatValue() + "%.";
+						msgDetail = MessageFormat.format(Constants.APP_STATUS_APPROVED_DETAIL_STD, limit, apr.floatValue());
 					} else {
-						msgDetail += " with a qualified introductory APR of 0.0% for the first 15 months.";
+						msgDetail = MessageFormat.format(Constants.APP_STATUS_APPROVED_DETAIL_INTRO, limit);
 					}
 					
 					app.setApplicationStatusDetails(msgDetail);
@@ -147,10 +174,7 @@ public class CreditApplicationService {
 					LOG.debug("Application Declined!");
 					
 					app.setApplicationStatus(Constants.APP_STATUS_DECLINED);
-					app.setApplicationStatusDetails("Thank you for your interest in a Digital Credit account."
-							                       + " Digital Credit has reviewed your application, and it was not"
-							   					   + " approved at this time because your debit is too high relative to"
-							                       + " your income in relation to your credit score.");
+					app.setApplicationStatusDetails(Constants.APP_STATUS_DECLINED_DETAIL_RISK);
 				}
 				
 			} else { // Declined
@@ -158,13 +182,13 @@ public class CreditApplicationService {
 				LOG.debug("Application Declined: Application data inconsistent with current records.");
 				
 				app.setApplicationStatus(Constants.APP_STATUS_DECLINED);
-				app.setApplicationStatusDetails("Thank you for your interest in a Digital Credit account."
-												+ " Digital Credit has reviewed your application, and it was not"
-												+ " approved at this time because the details provided in the application"
-												+ " are inconsistent with our records. Please contact customer service for further"
-												+ " assistance.");
+				app.setApplicationStatusDetails(Constants.APP_STATUS_DECLINED_DETAIL_INCON);
 			}
 			
+			// Save the Application Review Decision
+			creditApplicationRepository.save(app);
+			
+			// Send Updates to the Credit Consumer
 			creditProducer.sendCreditApplicationStatus(app);
 		
 		} // End Run

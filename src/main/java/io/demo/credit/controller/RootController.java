@@ -13,8 +13,6 @@ public class RootController {
 	 */
 	@GetMapping(Constants.URI_ROOT)
 	public String root() {
-		
-		
 		return Constants.DIR_REDIRECT + Constants.URI_SWAGGER_UI;
 	}
 

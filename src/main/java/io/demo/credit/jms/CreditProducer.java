@@ -37,8 +37,8 @@ public class CreditProducer {
 	        map.put(Constants.STATUS_ATT_APP_CREDIT_SCORE, app.getCreditScore().toString());
 	        map.put(Constants.STATUS_ATT_APP_RISK_SCORE, app.getRiskScore().toString());
 	        
-	        if (app.getApprovedCreditCard() != null)
-	        	map.put(Constants.STATUS_ATT_APP_CREDIT_ID, app.getApprovedCreditCard().getId().toString());
+	        if (app.getApprovedCardId() != null)
+	        	map.put(Constants.STATUS_ATT_APP_CREDIT_ID, app.getApprovedCardId().toString());
     		
 	        String jsonMessage = mapper.writeValueAsString(map);
 			

@@ -42,7 +42,12 @@ public class BillingAddress {
 	private String country;
 	
 	/*
-	 * Constuctor
+	 * Default Constructor
+	 */
+	public BillingAddress() {}
+	
+	/*
+	 * Constructor
 	 */
 	public BillingAddress (CreditCard card) {
 		this.card = card;

@@ -17,6 +17,36 @@ public class Constants {
 	public static final String APP_STATUS_DECLINED			= "Declined";
 	public static final String APP_STATUS_APPROVED			= "Approved";
 	
+	// Credit Application Status Details
+	public static final String APP_STATUS_SUBMITTED_DETAIL			= "Your credit application has been sent to the credit provider for review."
+																	+ " Expect a response from the credit provider shortly.";
+	
+	public static final String APP_STATUS_ACCEPTED_DETAIL			= "Thank you for your interest in a Digital Credit account."
+																	+ " Your application has been accepted. Once your "
+																	+ " application has completed the review process, you will recieve"
+																	+ " an update from the credit review team.";
+	
+	public static final String APP_STATUS_DECLINED_DETAIL_RISK		= "Thank you for your interest in a Digital Credit account."
+														            + " Digital Credit has reviewed your application, and it was not"
+														            + " approved at this time because your debit is too high relative to"
+														            + " your income in relation to your credit score.";
+	
+	public static final String APP_STATUS_DECLINED_DETAIL_INCON		= "Thank you for your interest in a Digital Credit account."
+																	+ " Digital Credit has reviewed your application, and it was not"
+																	+ " approved at this time because the details provided in the application"
+																	+ " are inconsistent with our records. Please contact customer service for further"
+																	+ " assistance.";
+	
+	public static final String APP_STATUS_APPROVED_DETAIL_STD		= "Thank you for your interest in a Digital Credit account." 
+														   		 	+ " Digital Credit has reviewed your application, and it has been"
+														   		 	+ " approved for a new credit line of ${0}.00"
+														   		 	+ " with a qualified APR of {1}%.";
+	
+	public static final String APP_STATUS_APPROVED_DETAIL_INTRO		= "Thank you for your interest in a Digital Credit account." 
+														   		 	+ " Digital Credit has reviewed your application, and it has been"
+														   		 	+ " approved for a new credit line of ${0}.00"
+														   		 	+ " with a qualified introductory APR of 0.0% for the first 15 months.";
+	
 	// Constants for message attributes
 	public static final String STATUS_ATT_APP_ID 			= "Id";
 	public static final String STATUS_ATT_APP_NO 			= "Number";
@@ -26,6 +56,9 @@ public class Constants {
 	public static final String STATUS_ATT_APP_RISK_SCORE    = "RiskScore";
 	public static final String STATUS_ATT_APP_CREDIT_ID 	= "approvedCardId";
 	public static final String STATUS_ATT_APP_CREDIT_APR 	= "approvedCardApr";
+	
+	// Credit Application Messgages
+	
 	
 	// Directives
 	public static final String DIR_REDIRECT 				= "redirect:";
@@ -77,8 +110,10 @@ public class Constants {
 	public static final String URI_API_USR_UNEXPIRE			= "/api/v1/user/{id}/state/unexpire";
 	public static final String URI_API_USR_UNLOCK			= "/api/v1/user/{id}/state/unlock";
 	public static final String URI_API_USR_PASS_UNEXPIRE	= "/api/v1/user/{id}/password/unexpire";
-	public static final String URI_API_CREDIT_APPLICATION	= "/api/v1/credit/application";
-	public static final String URI_API_CREDIT_CARD			= "/api/v1/credit/card/{id}";
+	public static final String URI_API_CREDIT_APP			= "/api/v1/credit/application";
+	public static final String URI_API_CREDIT_APP_ID		= "/api/v1/credit/application/{id}";
+	public static final String URI_API_CREDIT_CARD			= "/api/v1/credit/card";
+	public static final String URI_API_CREDIT_CARD_ID		= "/api/v1/credit/card/{id}";
 	public static final String URI_API_BILLING_DETAIL		= "/api/v1/credit/card/{id}/billing";
 	public static final String URI_API_CREDIT_TRANS			= "/api/v1/credit/card/{id}/transactions";
 

@@ -116,5 +116,6 @@ public class Constants {
 	public static final String URI_API_CREDIT_CARD_ID		= "/api/v1/credit/card/{id}";
 	public static final String URI_API_BILLING_DETAIL		= "/api/v1/credit/card/{id}/billing";
 	public static final String URI_API_CREDIT_TRANS			= "/api/v1/credit/card/{id}/transactions";
+	public static final String URI_API_HEALTHCHECK			= "/api/v1/health";
 
 }

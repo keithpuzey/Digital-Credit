@@ -6,7 +6,7 @@
 	<groupId>io.demo</groupId>
 	<artifactId>digitalcredit</artifactId>
 	<version>${revision}</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	
 	<name>Digital Credit</name>
 	<description>Digital Online Credit Card Sample Application</description>
@@ -30,7 +30,8 @@
         <tags></tags>
         <parallel.tests>1</parallel.tests>
         <buildNumber>local</buildNumber>
-        <revision>1.0.1.${buildNumber}</revision>
+        <revision>2.0.0.${buildNumber}</revision>
+        <contextPathName>credit</contextPathName>
 	</properties>
 
 	<dependencies>
@@ -196,7 +197,21 @@
 			          </goals>
 			        </execution>
 				</executions>
-			</plugin>    
+			</plugin>  
+			<plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-war-plugin</artifactId>
+            	<configuration>
+                <archive>
+                	<addMavenDescriptor>false</addMavenDescriptor>
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                        <classpathPrefix>lib/</classpathPrefix>
+                    </manifest>
+                </archive>
+                <warName>${contextPathName}##${revision}</warName>
+            </configuration>
+        	</plugin>  
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

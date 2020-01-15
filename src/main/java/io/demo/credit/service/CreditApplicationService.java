@@ -36,7 +36,7 @@ public class CreditApplicationService {
 	@Autowired
 	private UserService userService;
 	
-	@Autowired
+	@Autowired(required = false)
 	private CreditProducer creditProducer;
 	
 	@Autowired

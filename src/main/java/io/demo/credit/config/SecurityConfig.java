@@ -68,6 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
 			.antMatcher(Constants.URI_ALL)
 			.authorizeRequests()
 				.antMatchers(PUBLIC).permitAll()
+				.antMatchers(HttpMethod.GET, Constants.URI_API_HEALTHCHECK).permitAll()
 				.antMatchers(HttpMethod.POST, Constants.URI_API_AUTH).permitAll()
 				.anyRequest().hasRole(Patterns.ROLE_API)
 			.and()

@@ -8,6 +8,7 @@ import org.springframework.jms.support.JmsHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -23,6 +24,7 @@ import io.demo.credit.util.Constants;
 
 
 @Component
+@ConditionalOnProperty(value="io.demo.credit.app.process.enabled", havingValue = "true", matchIfMissing = false)
 public class CreditConsumer {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CreditConsumer.class);

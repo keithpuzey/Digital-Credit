@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -13,6 +14,7 @@ import io.demo.credit.model.CreditApplication;
 import io.demo.credit.util.Constants;
 
 @Component
+@ConditionalOnProperty(value="io.demo.credit.app.process.enabled", havingValue = "true", matchIfMissing = false)
 public class CreditProducer {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CreditProducer.class);

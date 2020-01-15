@@ -1,6 +1,5 @@
-FROM java:8
-EXPOSE 3500
-COPY /target/digitalcredit-1.0.1.105.jar /opt/digitalcredit/
-COPY /target/classes/application.properties /opt/digitalcredit/digitalcredit.properties
-WORKDIR /opt/digitalcredit
-CMD ["java", "-jar", "digitalcredit-1.0.1.105.jar", "--spring.config.location=digitalcredit.properties"]
+FROM tomcat:9.0
+EXPOSE 8080
+COPY /target/credit##2.0.0.102.war /usr/local/tomcat/webapps/
+COPY /target/classes/application.properties /usr/local/tomcat/conf/digitalcredit.properties
+HEALTHCHECK CMD curl -fail http://localhost:8080/credit/api/v1/health || exit 1

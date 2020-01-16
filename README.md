@@ -8,8 +8,8 @@ Digital Credit is a sample application that was developed for exploratory purpos
 
 ## Prerequisites
 
-* [Install Apache Maven](https://maven.apache.org/install.html)
-* Install the [Eclipse IDE](https://www.eclipse.org/ide/), [Spring Tools Suite](https://spring.io/tools) or [IntelliJ](https://www.jetbrains.com/idea/)
+* Install [Apache Maven](https://maven.apache.org/install.html)
+* Install [Eclipse IDE](https://www.eclipse.org/ide/), [Spring Tools Suite](https://spring.io/tools) or [IntelliJ](https://www.jetbrains.com/idea/)
 
 ## Executing Tests
 

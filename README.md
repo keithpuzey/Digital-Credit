@@ -57,6 +57,7 @@ Digital Credit can be deployed as a single standalone application service.
 * [PostgreSQL Database Engine](https://www.postgresql.org/) - PostgreSQL
 * [Serenity BDD](http://www.thucydides.info/#/) - Acceptance Testing Framework
 * [JUnit 5](https://junit.org/junit5/) - Unit Testing Framework
+
 ## Authors
 
 [Mark Asbury](https://github.com/asburymr)

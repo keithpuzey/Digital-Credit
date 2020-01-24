@@ -17,7 +17,7 @@ Digital Credit is a sample application that was developed for exploratory purpos
 * Serenity BDD Acceptance Tests - Execute "mvn clean verify"
   * Serenity BDD tests use Cucumber Feature file definitions. 
     * API Test are executed using the Rest Assured Java framework.
-  * Use '-Dcucumber.options="--tags {tag}"' mnv command line option to filter test execution based on Feature or Scenario tags defined within the [feature files](src/test/resources/features).
+  * Use '-Dcucumber.options="--tags {tag}"' maven command line option to filter test execution based on Feature or Scenario tags defined within the [feature files](src/test/resources/features).
 
 ## Packaging
 

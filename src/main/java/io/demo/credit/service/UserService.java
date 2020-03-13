@@ -95,7 +95,7 @@ public class UserService {
 	
 	/*
 	 * Find the user by the specified id. Returns the User object
-	 * if found otherwise the User object will be null.
+	 * if found otherwise the User object will be null .
 	 */
 	public Users findById(Long id) {
 	

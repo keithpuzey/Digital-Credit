@@ -191,7 +191,7 @@ public class UserService {
 	}
 	
 	/*
-	 * Updates an existing user profile with new profile data
+	 * Updates an existing user profile with new profile data and test
 	 */
 	public Users updateUserProfile(Users user, UserProfile newProfile) {
 		
